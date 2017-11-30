@@ -189,22 +189,18 @@ declare namespace Favicons {
     }
 
     type Stream = (params: any, handleHtml: any) => any
-
-    interface Favicons {
-        (
-            source: Buffer | string | string[],
-            configuration: Favicons.Configuration,
-            callback: (error: Error, response: Response) => void
-        ): void,
-        stream: Stream
-        config: ConfigDefaults
-    }
 }
 
 declare module 'favicons' {
-    const favicons: Favicons.Favicons
+    const favicons: {
+        (
+            source: Buffer | string | string[],
+            configuration: Favicons.Configuration,
+            callback: (error: Favicons.Error, response: Favicons.Response) => void
+        ): void,
+        stream: Favicons.Stream
+        config: Favicons.ConfigDefaults
+    }
 
-    export const stream: Favicons.Stream
-    export const config: Favicons.ConfigDefaults
-    export default favicons
+    export = favicons
 }

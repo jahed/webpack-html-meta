@@ -2,25 +2,25 @@ import { ok } from 'assert'
 import { join as joinPath } from 'path'
 import { forEach, merge } from 'lodash'
 import { load as loadHtml } from 'cheerio'
-import favicons, { config as configDefaults } from 'favicons'
+import * as favicons from 'favicons'
 import { Compiler, Plugin } from 'webpack'
 import Tapable = require('tapable')
 
-forEach(configDefaults.icons["android"], icon => {
+forEach(favicons.config.icons["android"], icon => {
     icon.transparent = false
 })
 
-configDefaults.html["opengraph"] = {
+favicons.config.html["opengraph"] = {
     "meta[property='og:site_name']": "<meta content='application-name' property='og:site_name'>",
     "meta[property='og:title']": "<meta content='application-name' property='og:title'>",
     "meta[property='og:image'][content$='favicon.png']": "<meta content='favicon.png' property='og:image'>"
 }
 
-configDefaults.html["standard"] = {
+favicons.config.html["standard"] = {
     "meta[name='title']": "<meta content='application-name' name='title'>"
 }
 
-configDefaults.html["twitter"] = {
+favicons.config.html["twitter"] = {
     "meta[name='twitter:title']": "<meta content='application-name' name='twitter:title'>",
     "meta[name='twitter:image'][content$='favicon.png']": "<meta content='favicon.png' name='twitter:image'>"
 }
