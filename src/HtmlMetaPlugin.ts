@@ -4,7 +4,7 @@ import { forEach, merge } from 'lodash'
 import { load as loadHtml } from 'cheerio'
 import * as favicons from 'favicons'
 import { Compiler, Plugin } from 'webpack'
-import Tapable = require('tapable')
+import * as Tapable from 'tapable'
 
 forEach(favicons.config.icons["android"], icon => {
     icon.transparent = false
