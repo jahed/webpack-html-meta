@@ -1,0 +1,52 @@
+{
+  "name": "@jahed/webpack-html-meta",
+  "version": "0.0.1",
+  "description": "Meta and Favicon Generator for Webpack",
+  "author": "Jahed Ahmed",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "jest",
+    "prepublishOnly": "yarn test && yarn run build",
+    "postpublish": "git push --follow-tags",
+    "docs": "bash -i ./docs.sh"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
+    ]
+  },
+  "dependencies": {
+    "debug": "3.1.0",
+    "favicons": "4.8.6",
+    "lodash": "4.17.4"
+  },
+  "devDependencies": {
+    "@types/cheerio": "0.22.6",
+    "@types/debug": "0.0.30",
+    "@types/html-webpack-plugin": "2.30.1",
+    "@types/jest": "21.1.8",
+    "@types/lodash": "4.14.86",
+    "@types/node": "6.x",
+    "@types/webpack": "3.8.1",
+    "jest": "21.2.1",
+    "rimraf": "2.6.2",
+    "ts-jest": "21.2.3",
+    "typedoc": "0.9.0",
+    "typescript": "2.6.2",
+    "webpack": "3.8.1"
+  }
+}

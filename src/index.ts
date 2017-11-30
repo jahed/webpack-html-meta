@@ -1,0 +1,1 @@
+export { HtmlMetaPlugin } from './HtmlMetaPlugin'
