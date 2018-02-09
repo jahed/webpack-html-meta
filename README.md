@@ -1,5 +1,7 @@
 # webpack-html-meta
 
+[![Patreon](https://img.shields.io/badge/patreon-donate-f96854.svg)](https://www.patreon.com/jahed)
+
 Generate Meta tags and Favicons for your HTML as part of your Webpack build.
 
 The Favicons are generated using [`favicons`](https://github.com/evilebottnawi/favicons) which takes one icon and
