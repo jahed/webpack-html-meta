@@ -12,8 +12,8 @@ forEach(favicons.config.icons["android"], icon => {
 
 // Add a generic higher quality favicon for Open Graph.
 favicons.config.icons.favicons["favicon.png"] = {
-    "width": 128,
-    "height": 128,
+    "width": 256,
+    "height": 256,
     "transparent": true,
     "rotate": false,
     "mask": false
