@@ -3,8 +3,8 @@ import { join as joinPath } from 'path'
 import { forEach, merge } from 'lodash'
 import { load as loadHtml } from 'cheerio'
 import * as favicons from 'favicons'
-import { Compiler, Plugin } from 'webpack'
-import * as Tapable from 'tapable'
+import { Compiler, Plugin, compilation } from 'webpack'
+import { AsyncSeriesHook } from 'tapable'
 
 forEach(favicons.config.icons["android"], icon => {
     icon.transparent = false
@@ -55,13 +55,12 @@ interface HtmlWebpackPluginEventData {
 
 type HtmlWebpackPluginEventCallback = (error?: Error, data?: HtmlWebpackPluginEventData) => void
 
-interface Asset {
-    source: () => string | Buffer,
-    size: () => number
+interface CustomCompilationHooks extends compilation.CompilationHooks {
+    htmlWebpackPluginBeforeHtmlProcessing: AsyncSeriesHook<HtmlWebpackPluginEventData>
 }
 
-interface Compilation extends Tapable {
-    assets: { [path: string]: Asset }
+interface Compilation extends compilation.Compilation {
+    hooks: CustomCompilationHooks
 }
 
 const defaultOptions: PluginOptions = {
@@ -87,20 +86,20 @@ class HtmlMetaPlugin implements Plugin {
     }
 
     apply(compiler: Compiler) {
-        compiler.plugin('make', (_, callback) => {
+        compiler.hooks.make.tapAsync('HtmlMetaPlugin', (_: Compilation, callback: Function) => {
             this._createFiles()
                 .then(() => callback())
                 .catch(error => callback(error))
         })
 
-        compiler.plugin('emit', (compilation: Compilation, emitCallback) => {
+        compiler.hooks.emit.tapAsync('HtmlMetaPlugin', (compilation: Compilation, emitCallback: Function) => {
             this._createFiles()
                 .then(({ files, images, html: [htmlFirst, ...htmlRest] }) => {
                     this._addFilesToAssets(compilation, files)
                     this._addFilesToAssets(compilation, images)
 
-                    compilation.plugin(
-                        'html-webpack-plugin-before-html-processing',
+                    compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
+                        'HtmlMetaPlugin',
                         (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
                             const { manifest } = this._options
                             const $ = loadHtml(htmlData.html)

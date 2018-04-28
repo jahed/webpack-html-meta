@@ -11,7 +11,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist && tsc",
-    "test": "jest",
+    "test": "echo 'No tests yet :('",
     "prepublishOnly": "yarn test && yarn run build",
     "postpublish": "git push --follow-tags",
     "docs": "bash -i ./docs.sh"
@@ -32,26 +32,27 @@
   "dependencies": {
     "cheerio": "1.0.0-rc.2",
     "debug": "3.1.0",
-    "favicons": "4.8.6",
-    "lodash": "4.17.4"
+    "favicons": "5.1.1",
+    "lodash": "4.17.10"
   },
   "devDependencies": {
-    "@types/cheerio": "0.22.6",
+    "@types/cheerio": "0.22.7",
     "@types/debug": "0.0.30",
-    "@types/html-webpack-plugin": "2.30.1",
-    "@types/jest": "21.1.8",
-    "@types/lodash": "4.14.86",
-    "@types/node": "6.x",
-    "@types/webpack": "3.8.1",
-    "jest": "21.2.1",
+    "@types/html-webpack-plugin": "2.30.3",
+    "@types/jest": "22.2.3",
+    "@types/lodash": "4.14.108",
+    "@types/node": "8.10.10",
+    "@types/tapable": "1.0.2",
+    "@types/webpack": "4.1.4",
+    "jest": "22.4.3",
     "rimraf": "2.6.2",
-    "ts-jest": "21.2.3",
-    "typedoc": "0.9.0",
-    "typescript": "2.6.2",
-    "webpack": "3.8.1"
+    "ts-jest": "22.4.4",
+    "typedoc": "0.11.1",
+    "typescript": "2.8.3",
+    "webpack": "4.6.0"
   },
   "peerDependencies": {
-    "html-webpack-plugin": "^2.30.1",
-    "webpack": ">=2"
+    "html-webpack-plugin": ">=3",
+    "webpack": ">=4"
   }
 }
