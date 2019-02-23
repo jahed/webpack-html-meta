@@ -142,7 +142,9 @@ class HtmlMetaPlugin implements Plugin {
 
   private _addFilesToAssets(compilation: Compilation, files: Array<Favicons.File | Favicons.Image>): void {
     forEach(files, file => {
-      const assetPath = path.join(this._options.manifest.path, file.name)
+      const assetPath = path
+        .join(this._options.manifest.path, file.name)
+        .replace(/^\//, '')
 
       compilation.assets[assetPath] = {
         source() {
