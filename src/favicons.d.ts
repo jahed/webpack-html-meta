@@ -202,5 +202,5 @@ declare module 'favicons' {
     config: Favicons.ConfigDefaults
   }
 
-  export = favicons
+  export default favicons
 }

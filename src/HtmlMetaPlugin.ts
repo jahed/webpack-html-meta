@@ -1,8 +1,8 @@
-import { ok } from 'assert'
-import { join as joinPath } from 'path'
+import assert from 'assert'
+import path from 'path'
 import { forEach, merge } from 'lodash'
 import { load as loadHtml } from 'cheerio'
-import * as favicons from 'favicons'
+import favicons from 'favicons'
 import { Compiler, Plugin, compilation } from 'webpack'
 import { AsyncSeriesHook } from 'tapable'
 
@@ -82,7 +82,7 @@ class HtmlMetaPlugin implements Plugin {
   constructor(userOptions: PluginOptions) {
     this._options = merge({}, defaultOptions, userOptions)
 
-    ok(this._options.faviconSource, 'options.faviconSource is required. e.g. ./images/favicon.png')
+    assert.ok(this._options.faviconSource, 'options.faviconSource is required. e.g. ./images/favicon.png')
   }
 
   apply(compiler: Compiler) {
@@ -142,7 +142,8 @@ class HtmlMetaPlugin implements Plugin {
 
   private _addFilesToAssets(compilation: Compilation, files: Array<Favicons.File | Favicons.Image>): void {
     forEach(files, file => {
-      const assetPath = joinPath(this._options.manifest.path, file.name)
+      const assetPath = path.join(this._options.manifest.path, file.name)
+
       compilation.assets[assetPath] = {
         source() {
           return file.contents
