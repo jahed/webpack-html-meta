@@ -44,9 +44,14 @@ export interface Manifest extends Favicons.Configuration {
   icons?: ExtendedIcons
 }
 
-export interface PluginOptions {
+export interface UserOptions {
   faviconSource: string,
   manifest?: Manifest
+}
+
+export interface PluginOptions {
+  faviconSource: string,
+  manifest: { path: string } & Manifest
 }
 
 interface HtmlWebpackPluginEventData {
@@ -63,8 +68,7 @@ interface Compilation extends compilation.Compilation {
   hooks: CustomCompilationHooks
 }
 
-const defaultOptions: PluginOptions = {
-  faviconSource: undefined,
+const defaultOptions = {
   manifest: {
     path: '/meta/',
     icons: {
@@ -79,10 +83,9 @@ class HtmlMetaPlugin implements Plugin {
   private _options: PluginOptions
   private _result: Favicons.Response
 
-  constructor(userOptions: PluginOptions) {
+  constructor(userOptions: UserOptions) {
+    assert.ok(userOptions.faviconSource, 'options.faviconSource is required. e.g. "./images/favicon.png"')
     this._options = merge({}, defaultOptions, userOptions)
-
-    assert.ok(this._options.faviconSource, 'options.faviconSource is required. e.g. ./images/favicon.png')
   }
 
   apply(compiler: Compiler) {
@@ -101,12 +104,11 @@ class HtmlMetaPlugin implements Plugin {
           compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
             'HtmlMetaPlugin',
             (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
-              const { manifest } = this._options
               const $ = loadHtml(htmlData.html)
               const $head = $('head')
 
               $head.append('<!-- <MetaPlugin> -->')
-              $head.append(`<title>${manifest.appName}</title>`)
+              $head.append(`<title>${this._options.manifest.appName}</title>`)
               $head.append(htmlFirst, ...htmlRest)
               $head.append('<!-- </MetaPlugin> -->')
 
