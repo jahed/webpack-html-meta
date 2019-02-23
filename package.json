@@ -16,8 +16,8 @@
     "build:docs": "rimraf docs && typedoc --theme default --out docs --mode file",
     "push:git": "git push && git push --tags",
     "push:docs": "bash -i ./publish-docs.sh",
-    "prepare": "yarn lint && yarn test && yarn build:lib && yarn build:docs",
-    "deploy": "yarn prepare && yarn publish && yarn push:git && yarn push:docs",
+    "build": "yarn lint && yarn test && yarn build:lib && yarn build:docs",
+    "deploy": "yarn build && yarn publish && yarn push:git && yarn push:docs",
     "deps": "yarn upgrade-interactive --latest && yarn upgrade && git add yarn.lock '*package.json' && git commit -m 'build(deps): upgrade dependencies'"
   },
   "dependencies": {
