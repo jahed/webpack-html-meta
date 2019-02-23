@@ -4,7 +4,7 @@
     "target": "es5",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "lib": [
       "es6",
       "dom"
@@ -14,7 +14,7 @@
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "declarationDir": "dist",
+    "declarationDir": "lib",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
