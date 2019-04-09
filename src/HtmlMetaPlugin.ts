@@ -61,7 +61,7 @@ interface HtmlWebpackPluginEventData {
 type HtmlWebpackPluginEventCallback = (error?: Error, data?: HtmlWebpackPluginEventData) => void
 
 interface CustomCompilationHooks extends compilation.CompilationHooks {
-  htmlWebpackPluginBeforeHtmlProcessing: AsyncSeriesHook<HtmlWebpackPluginEventData>
+  htmlWebpackPluginBeforeHtmlProcessing?: AsyncSeriesHook<HtmlWebpackPluginEventData>
 }
 
 interface Compilation extends compilation.Compilation {
@@ -101,21 +101,23 @@ class HtmlMetaPlugin implements Plugin {
           this._addFilesToAssets(compilation, files)
           this._addFilesToAssets(compilation, images)
 
-          compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
-            'HtmlMetaPlugin',
-            (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
-              const $ = loadHtml(htmlData.html)
-              const $head = $('head')
+          if (compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing) {
+            compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
+              'HtmlMetaPlugin',
+              (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
+                const $ = loadHtml(htmlData.html)
+                const $head = $('head')
 
-              $head.append('<!-- <MetaPlugin> -->')
-              $head.append(`<title>${this._options.manifest.appName}</title>`)
-              $head.append(htmlFirst, ...htmlRest)
-              $head.append('<!-- </MetaPlugin> -->')
+                $head.append('<!-- <MetaPlugin> -->')
+                $head.append(`<title>${this._options.manifest.appName}</title>`)
+                $head.append(htmlFirst, ...htmlRest)
+                $head.append('<!-- </MetaPlugin> -->')
 
-              htmlData.html = $.html()
-              htmlCallback(undefined, htmlData)
-            }
-          )
+                htmlData.html = $.html()
+                htmlCallback(undefined, htmlData)
+              }
+            )
+          }
         })
         .then(
           () => emitCallback(),
