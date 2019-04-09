@@ -117,8 +117,10 @@ class HtmlMetaPlugin implements Plugin {
             }
           )
         })
-        .then(() => emitCallback())
-        .catch(error => emitCallback(error))
+        .then(
+          () => emitCallback(),
+          error => emitCallback(error)
+        )
     })
   }
 
