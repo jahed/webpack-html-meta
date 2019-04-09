@@ -81,84 +81,79 @@ const defaultOptions = {
 
 class HtmlMetaPlugin implements Plugin {
   private _options: PluginOptions
-  private _result: Favicons.Response
+  private _assets: Favicons.Response
+  private _done: boolean
 
   constructor(userOptions: UserOptions) {
     assert.ok(userOptions.faviconSource, 'options.faviconSource is required. e.g. "./images/favicon.png"')
     this._options = merge({}, defaultOptions, userOptions)
+    this._done = false
   }
 
   apply(compiler: Compiler) {
     compiler.hooks.make.tapAsync('HtmlMetaPlugin', (_: Compilation, callback: Function) => {
-      this._createFiles()
+      this._createAssets()
         .then(() => callback())
         .catch(error => callback(error))
     })
 
-    compiler.hooks.emit.tapAsync('HtmlMetaPlugin', (compilation: Compilation, emitCallback: Function) => {
-      this._createFiles()
-        .then(({ files, images, html: [htmlFirst, ...htmlRest] }) => {
-          this._addFilesToAssets(compilation, files)
-          this._addFilesToAssets(compilation, images)
+    compiler.hooks.emit.tap('HtmlMetaPlugin', (compilation: Compilation) => {
+      if (compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing) {
+        // Always add the html-webpack-plugin hook in case the html changes
+        compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
+          'HtmlMetaPlugin',
+          (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
+            const $ = loadHtml(htmlData.html)
+            const $head = $('head')
+            const [htmlFirst, ...htmlRest] = this._assets.html
 
-          if (compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing) {
-            compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
-              'HtmlMetaPlugin',
-              (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
-                const $ = loadHtml(htmlData.html)
-                const $head = $('head')
+            $head.append('<!-- <MetaPlugin> -->')
+            $head.append(`<title>${this._options.manifest.appName}</title>`)
+            $head.append(htmlFirst, ...htmlRest)
+            $head.append('<!-- </MetaPlugin> -->')
 
-                $head.append('<!-- <MetaPlugin> -->')
-                $head.append(`<title>${this._options.manifest.appName}</title>`)
-                $head.append(htmlFirst, ...htmlRest)
-                $head.append('<!-- </MetaPlugin> -->')
-
-                htmlData.html = $.html()
-                htmlCallback(undefined, htmlData)
-              }
-            )
+            htmlData.html = $.html()
+            htmlCallback(undefined, htmlData)
           }
-        })
-        .then(
-          () => emitCallback(),
-          error => emitCallback(error)
         )
+      }
+
+      if (this._done) {
+        // Only emit the first time.
+        return
+      }
+
+      this._emitAssets(compilation, this._assets.files)
+      this._emitAssets(compilation, this._assets.images)
+      this._done = true
     })
   }
 
-  private _createFiles(): Promise<Favicons.Response> {
-    if (this._result) {
-      return Promise.resolve(this._result)
-    }
-
+  private _createAssets(): Promise<Favicons.Response> {
     return new Promise((resolve, reject) => {
       const source = this._options.faviconSource
       const configuration = this._options.manifest
 
-      favicons(source, configuration, (error, result) => {
+      favicons(source, configuration, (error, assets) => {
         if (error) {
           reject(error)
           return
         }
-        this._result = result
-        resolve(result)
+        this._assets = assets
+        resolve(assets)
       })
     })
   }
 
-  private _addFilesToAssets(compilation: Compilation, files: Array<Favicons.File | Favicons.Image>): void {
-    forEach(files, file => {
+  private _emitAssets(compilation: Compilation, assetGroup: Array<Favicons.File | Favicons.Image>): void {
+    forEach(assetGroup, asset => {
       const assetPath = path
-        .join(this._options.manifest.path, file.name)
+        .join(this._options.manifest.path, asset.name)
         .replace(/^\//, '')
 
       compilation.assets[assetPath] = {
-        source() {
-          return file.contents
-        },
-        size() {
-          return file.contents.length
-        }
+        source: () => asset.contents,
+        size: () => asset.contents.length
       }
     })
   }
