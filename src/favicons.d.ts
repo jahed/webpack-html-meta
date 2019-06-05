@@ -179,10 +179,16 @@ declare namespace Favicons {
     html: HTML[]
   }
 
+  interface HTMLTemplateOptions extends Configuration {
+    relative: (filename: string) => string
+  }
+
+  type HTMLTemplate = (options: HTMLTemplateOptions) => string
+
   interface ConfigDefaults {
     defaults: Configuration,
     files: any,
-    html: { [platform: string]: { [template: string]: string } },
+    html: { [platform: string]: HTMLTemplate[] },
     icons: any,
     'platform-options': any,
     rfg: any

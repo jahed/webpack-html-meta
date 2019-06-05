@@ -19,20 +19,20 @@ favicons.config.icons.favicons["favicon.png"] = {
   "mask": false
 }
 
-favicons.config.html["opengraph"] = {
-  "meta[property='og:site_name']": "<meta content='application-name' property='og:site_name'>",
-  "meta[property='og:title']": "<meta content='application-name' property='og:title'>",
-  "meta[property='og:image'][content$='favicon.png']": "<meta content='favicon.png' property='og:image'>"
-}
+favicons.config.html["opengraph"] = [
+  ({ appName }) => `<meta content='${appName}' property='og:site_name'>`,
+  ({ appName }) => `<meta content='${appName}' property='og:title'>`,
+  ({ relative }) => `<meta content='${relative('favicon.png')}' property='og:image'>`
+]
 
-favicons.config.html["standard"] = {
-  "meta[name='title']": "<meta content='application-name' name='title'>"
-}
+favicons.config.html["standard"] = [
+  ({ appName }) => `<meta content='${appName}' name='title'>`
+]
 
-favicons.config.html["twitter"] = {
-  "meta[name='twitter:title']": "<meta content='application-name' name='twitter:title'>",
-  "meta[name='twitter:image'][content$='favicon.png']": "<meta content='favicon.png' name='twitter:image'>"
-}
+favicons.config.html["twitter"] = [
+  ({ appName }) => `<meta content='${appName}' name='twitter:title'>`,
+  ({ relative }) => `<meta content='${relative('favicon.png')}' name='twitter:image'>`
+]
 
 export interface ExtendedIcons extends Favicons.Icons {
   opengraph?: boolean,
