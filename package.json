@@ -1,6 +1,6 @@
 {
   "name": "@jahed/webpack-html-meta",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "Meta and Favicon Generator for Webpack",
   "author": "Jahed Ahmed",
   "license": "MIT",
