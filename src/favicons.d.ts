@@ -197,7 +197,7 @@ declare namespace Favicons {
   type Stream = (params: any, handleHtml: any) => any
 }
 
-declare module 'favicons' {
+declare module '@jahed/favicons' {
   const favicons: {
     (
       source: Buffer | string | string[],

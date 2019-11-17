@@ -1,10 +1,10 @@
+import favicons from '@jahed/favicons'
 import assert from 'assert'
-import path from 'path'
-import { forEach, merge } from 'lodash'
 import { load as loadHtml } from 'cheerio'
-import favicons from 'favicons'
-import { Compiler, Plugin, compilation } from 'webpack'
+import { forEach, merge } from 'lodash'
+import path from 'path'
 import { AsyncSeriesHook } from 'tapable'
+import { compilation, Compiler, Plugin } from 'webpack'
 
 forEach(favicons.config.icons["android"], icon => {
   icon.transparent = false
@@ -160,3 +160,4 @@ class HtmlMetaPlugin implements Plugin {
 }
 
 export { HtmlMetaPlugin }
+
