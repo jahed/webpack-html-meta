@@ -31,15 +31,18 @@ const absoluteOrRelative = (file: string, options: HTMLTemplateOptions): string 
 favicons.config.html["opengraph"] = [
   ({ appName }) => `<meta content='${appName}' property='og:site_name'>`,
   ({ appName }) => `<meta content='${appName}' property='og:title'>`,
+  ({ appDescription }) => `<meta content='${appDescription}' property='og:description'>`,
   options => `<meta content='${absoluteOrRelative('favicon.png', options)}' property='og:image'>`
 ]
 
 favicons.config.html["standard"] = [
-  ({ appName }) => `<meta content='${appName}' name='title'>`
+  ({ appName }) => `<meta content='${appName}' name='title'>`,
+  ({ appDescription }) => `<meta content='${appDescription}' name='description'>`
 ]
 
 favicons.config.html["twitter"] = [
   ({ appName }) => `<meta content='${appName}' name='twitter:title'>`,
+  ({ appDescription }) => `<meta content='${appDescription}' name='twitter:description'>`,
   options => `<meta content='${absoluteOrRelative('favicon.png', options)}' name='twitter:image'>`
 ]
 
