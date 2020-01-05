@@ -1,4 +1,4 @@
-import favicons from '@jahed/favicons'
+import favicons, { HTMLTemplateOptions } from '@jahed/favicons'
 import assert from 'assert'
 import { load as loadHtml } from 'cheerio'
 import { forEach, merge } from 'lodash'
@@ -19,10 +19,19 @@ favicons.config.icons.favicons["favicon.png"] = {
   "mask": false
 }
 
+const absoluteOrRelative = (file: string, options: HTMLTemplateOptions): string => {
+  const filePath = options.relative(file)
+  try {
+    return new URL(filePath, options.start_url).href
+  } catch {
+    return filePath
+  }
+}
+
 favicons.config.html["opengraph"] = [
   ({ appName }) => `<meta content='${appName}' property='og:site_name'>`,
   ({ appName }) => `<meta content='${appName}' property='og:title'>`,
-  ({ relative }) => `<meta content='${relative('favicon.png')}' property='og:image'>`
+  options => `<meta content='${absoluteOrRelative('favicon.png', options)}' property='og:image'>`
 ]
 
 favicons.config.html["standard"] = [
@@ -31,7 +40,7 @@ favicons.config.html["standard"] = [
 
 favicons.config.html["twitter"] = [
   ({ appName }) => `<meta content='${appName}' name='twitter:title'>`,
-  ({ relative }) => `<meta content='${relative('favicon.png')}' name='twitter:image'>`
+  options => `<meta content='${absoluteOrRelative('favicon.png', options)}' name='twitter:image'>`
 ]
 
 export interface ExtendedIcons extends Favicons.Icons {

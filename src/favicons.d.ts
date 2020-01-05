@@ -208,5 +208,6 @@ declare module '@jahed/favicons' {
     config: Favicons.ConfigDefaults
   }
 
+  export type HTMLTemplateOptions = Favicons.HTMLTemplateOptions
   export default favicons
 }
