@@ -40,16 +40,9 @@ favicons.config.html["standard"] = [
   ({ appDescription }) => `<meta content='${appDescription}' name='description'>`
 ]
 
-favicons.config.html["twitter"] = [
-  ({ appName }) => `<meta content='${appName}' name='twitter:title'>`,
-  ({ appDescription }) => `<meta content='${appDescription}' name='twitter:description'>`,
-  options => `<meta content='${absoluteOrRelative('favicon.png', options)}' name='twitter:image'>`
-]
-
 export interface ExtendedIcons extends Favicons.Icons {
   opengraph?: boolean,
-  standard?: boolean,
-  twitter?: boolean
+  standard?: boolean
 }
 
 export interface Manifest extends Favicons.Configuration {
@@ -85,8 +78,7 @@ const defaultOptions = {
     path: '/meta/',
     icons: {
       opengraph: true,
-      standard: true,
-      twitter: true
+      standard: true
     }
   }
 }
