@@ -21,9 +21,9 @@
     "deps": "yarn upgrade-interactive --latest && yarn upgrade && git add yarn.lock '*package.json' && git commit -m 'build(deps): upgrade dependencies'"
   },
   "dependencies": {
-    "@jahed/favicons": "^5.6.1",
     "cheerio": "^1.0.0-rc.3",
     "debug": "^4.1.1",
+    "favicons": "^6.0.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {

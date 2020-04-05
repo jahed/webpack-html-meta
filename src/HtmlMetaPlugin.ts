@@ -1,5 +1,5 @@
-import favicons from '@jahed/favicons'
-import type { HTMLTemplateOptions } from '@jahed/favicons'
+import favicons from 'favicons'
+import type { HTMLTemplateOptions } from 'favicons'
 import assert from 'assert'
 import { load as loadHtml } from 'cheerio'
 import type { default as HtmlWebpackPluginInstance } from 'html-webpack-plugin'
@@ -75,7 +75,6 @@ const defaultOptions = {
 const extractHtmlWebpackPluginModule = (compiler: Compiler): typeof HtmlWebpackPluginInstance | null=> {
   const htmlWebpackPlugin = (compiler.options.plugins || []).find(
     (plugin) => {
-      console.log(plugin.constructor.name)
       return plugin.constructor.name === 'HtmlWebpackPlugin'
     }
   ) as typeof HtmlWebpackPluginInstance | undefined
