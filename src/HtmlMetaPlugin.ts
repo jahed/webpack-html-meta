@@ -1,10 +1,11 @@
-import favicons, { HTMLTemplateOptions } from '@jahed/favicons'
+import favicons from '@jahed/favicons'
+import type { HTMLTemplateOptions } from '@jahed/favicons'
 import assert from 'assert'
 import { load as loadHtml } from 'cheerio'
+import type { default as HtmlWebpackPluginInstance } from 'html-webpack-plugin'
 import { forEach, merge } from 'lodash'
 import path from 'path'
-import { AsyncSeriesHook } from 'tapable'
-import { compilation, Compiler, Plugin } from 'webpack'
+import type { compilation, Compiler, Plugin } from 'webpack'
 
 forEach(favicons.config.icons["android"], icon => {
   icon.transparent = false
@@ -59,19 +60,7 @@ export interface PluginOptions {
   manifest: { path: string } & Manifest
 }
 
-interface HtmlWebpackPluginEventData {
-  html: string
-}
-
-type HtmlWebpackPluginEventCallback = (error?: Error, data?: HtmlWebpackPluginEventData) => void
-
-interface CustomCompilationHooks extends compilation.CompilationHooks {
-  htmlWebpackPluginBeforeHtmlProcessing?: AsyncSeriesHook<HtmlWebpackPluginEventData>
-}
-
-interface Compilation extends compilation.Compilation {
-  hooks: CustomCompilationHooks
-}
+type Compilation = compilation.Compilation
 
 const defaultOptions = {
   manifest: {
@@ -81,6 +70,23 @@ const defaultOptions = {
       standard: true
     }
   }
+}
+
+const extractHtmlWebpackPluginModule = (compiler: Compiler): typeof HtmlWebpackPluginInstance | null=> {
+  const htmlWebpackPlugin = (compiler.options.plugins || []).find(
+    (plugin) => {
+      console.log(plugin.constructor.name)
+      return plugin.constructor.name === 'HtmlWebpackPlugin'
+    }
+  ) as typeof HtmlWebpackPluginInstance | undefined
+  if (!htmlWebpackPlugin) {
+    return null
+  }
+  const HtmlWebpackPlugin = htmlWebpackPlugin.constructor
+  if (!HtmlWebpackPlugin || !('getHooks' in HtmlWebpackPlugin)) {
+    return null
+  }
+  return HtmlWebpackPlugin as typeof HtmlWebpackPluginInstance
 }
 
 class HtmlMetaPlugin implements Plugin {
@@ -95,6 +101,11 @@ class HtmlMetaPlugin implements Plugin {
   }
 
   apply(compiler: Compiler) {
+    const HtmlWebpackPlugin = extractHtmlWebpackPluginModule(compiler)
+    if (!HtmlWebpackPlugin) {
+      throw new Error('HtmlMetaPlugin needs to be used with html-webpack-plugin@4')
+    }
+
     compiler.hooks.make.tapAsync('HtmlMetaPlugin', (_: Compilation, callback: Function) => {
       this._createAssets()
         .then(() => callback())
@@ -102,25 +113,22 @@ class HtmlMetaPlugin implements Plugin {
     })
 
     compiler.hooks.emit.tap('HtmlMetaPlugin', (compilation: Compilation) => {
-      if (compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing) {
-        // Always add the html-webpack-plugin hook in case the html changes
-        compilation.hooks.htmlWebpackPluginBeforeHtmlProcessing.tapAsync(
-          'HtmlMetaPlugin',
-          (htmlData: HtmlWebpackPluginEventData, htmlCallback: HtmlWebpackPluginEventCallback) => {
-            const $ = loadHtml(htmlData.html)
-            const $head = $('head')
-            const [htmlFirst, ...htmlRest] = this._assets.html
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(
+        'HtmlMetaPlugin',
+        (data, callback) => {
+          const $ = loadHtml(data.html)
+          const $head = $('head')
+          const [htmlFirst, ...htmlRest] = this._assets.html
 
-            $head.append('<!-- <MetaPlugin> -->')
-            $head.append(`<title>${this._options.manifest.appName}</title>`)
-            $head.append(htmlFirst, ...htmlRest)
-            $head.append('<!-- </MetaPlugin> -->')
+          $head.append('<!-- <MetaPlugin> -->')
+          $head.append(`<title>${this._options.manifest.appName}</title>`)
+          $head.append(htmlFirst, ...htmlRest)
+          $head.append('<!-- </MetaPlugin> -->')
 
-            htmlData.html = $.html()
-            htmlCallback(undefined, htmlData)
-          }
-        )
-      }
+          data.html = $.html()
+          callback(null, data)
+        }
+      )
 
       if (this._done) {
         // Only emit the first time.
